@@ -153,6 +153,9 @@ localparam CONF_STR = {
 	"O1,Aspect ratio,4:3,16:9;",
 	"O2,TV Mode,NTSC,PAL;",
 	"O34,Noise,White,Red,Green,Blue;",
+	"J1,R,G,B;",
+	"jn,A,B,X;",
+	"jp,A,B,X;",
 	"-;",
 	"P1,Test Page 1;",
 	"P1-;",
@@ -180,6 +183,8 @@ wire  [1:0] buttons;
 wire [31:0] status;
 wire [10:0] ps2_key;
 
+wire [15:0] joyA;
+
 hps_io #(.STRLEN($size(CONF_STR)>>3)) hps_io
 (
 	.clk_sys(clk_sys),
@@ -189,6 +194,7 @@ hps_io #(.STRLEN($size(CONF_STR)>>3)) hps_io
 	.forced_scandoubler(forced_scandoubler),
 
 	.buttons(buttons),
+	.joystick_0(joyA),
 	.status(status),
 	.status_menumask({status[5]}),
 	
@@ -243,9 +249,12 @@ assign CE_PIXEL = ce_pix;
 assign VGA_DE = ~(HBlank | VBlank);
 assign VGA_HS = HSync;
 assign VGA_VS = VSync;
-assign VGA_G  = (!col || col == 2) ? video : 8'd0;
-assign VGA_R  = (!col || col == 1) ? video : 8'd0;
-assign VGA_B  = (!col || col == 3) ? video : 8'd0;
+//assign VGA_G  = (!col || col == 2) ? video : 8'd0;
+//assign VGA_R  = (!col || col == 1) ? video : 8'd0;
+//assign VGA_B  = (!col || col == 3) ? video : 8'd0;
+assign VGA_G  = (joyA[5]) ? video : 8'd0;
+assign VGA_R  = (joyA[4]) ? video : 8'd0;
+assign VGA_B  = (joyA[6]) ? video : 8'd0;
 
 reg  [26:0] act_cnt;
 always @(posedge clk_sys) act_cnt <= act_cnt + 1'd1; 
